@@ -4,7 +4,7 @@ define('PATH', dirname(__DIR__) . '/includes/');
 
 class StatisticPlug {
 
-    const SELECT = "SELECT slct FROM tbl";
+    const SELECT = "SELECT DISTINCT slct FROM tbl";
 
     /**
      * StatisticPlug constructor.
@@ -80,8 +80,10 @@ class StatisticPlug {
         global $wpdb;
         $cookie = $_COOKIE['PHPSESSID'];
         $this->sp_create_table_if_not_exists();
-        $query   = str_replace(array("slct", "tbl"), array("session", $wpdb->prefix . "visit"), self::SELECT);
-        $results = $wpdb->get_results($query);
+        $query   = str_replace(array("slct", "tbl"), array("session", $wpdb->prefix . "visit"), self::SELECT) . " WHERE session = %s";
+        $results = $wpdb->query(
+            $wpdb->prepare($query, $cookie)
+        );
         if (empty($results)) {
             $this->sp_register($cookie);
         }
