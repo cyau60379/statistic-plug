@@ -58,7 +58,7 @@ class StatisticPlug {
         }
     }
 
-    function sp_register(string $session) {
+    function sp_register($session) {
         global $wpdb;
         $table_name = $wpdb->prefix . "visit";
         $date       = date("Y-m-d");
@@ -79,13 +79,15 @@ class StatisticPlug {
     function sp_register_connection() {
         global $wpdb;
         $cookie = $_COOKIE['PHPSESSID'];
-        $this->sp_create_table_if_not_exists();
-        $query   = str_replace(array("slct", "tbl"), array("session", $wpdb->prefix . "visit"), self::SELECT) . " WHERE session = %s";
-        $results = $wpdb->query(
-            $wpdb->prepare($query, $cookie)
-        );
-        if (empty($results)) {
-            $this->sp_register($cookie);
+        if (!empty($cookie)) {
+            $this->sp_create_table_if_not_exists();
+            $query   = str_replace(array("slct", "tbl"), array("session", $wpdb->prefix . "visit"), self::SELECT) . " WHERE session = %s";
+            $results = $wpdb->query(
+                $wpdb->prepare($query, $cookie)
+            );
+            if (empty($results)) {
+                $this->sp_register($cookie);
+            }
         }
     }
 }
